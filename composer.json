@@ -1,0 +1,40 @@
+{
+  // package name
+  "name": "sam002/yii2-otp",
+
+  // package type
+  "type": "yii2-extension",
+
+  "description": "YII2 extension for generating one time passwords according to RFC 4226/6238 (HOTP/TOTP Algorithm) and authentication widget",
+  "keywords": ["yii2", "otp", "hotp", "totp", "two-factor authentication", "2FA", "two-factor", "authentication"],
+  "license": "LGPL-3.0",
+  "support": {
+    "issues": "https://github.com/sam002/yii2-otp/issues",
+    "source": "https://github.com/sam002/yii2-otp"
+  },
+  "authors": [
+    {
+      "name": "Semen Dubina",
+      "email": "yii2-otp@sam002.net",
+      "homepage": "http://sam002.net/project/yii2-otp",
+      "role": "Developer"
+    }
+  ],
+
+  // package dependencies
+  "require": {
+    "yiisoft/yii2": "*",
+    "spomky-labs/otphp": "^6.0",
+    "2amigos/yii2-qrcode-helper" : "~1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "4.*"
+  },
+
+  // class autoloading specs
+  "autoload": {
+    "psr-4": {
+      "sam002\\otp\\": "src"
+    }
+  }
+}
