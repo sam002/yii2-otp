@@ -5,7 +5,7 @@
  * Time: 23:06
  */
 
-namespace sam002\helpers;
+namespace sam002\otp\helpers;
 
 use Base32\Base32;
 use yii\base\Security;
@@ -19,10 +19,11 @@ class OtpHelper
      * @param int $length
      * @return string
      */
-    static public function generateSecret($length = 16)
+    static public function generateSecret($length = 20)
     {
         $security = new Security();
-        return Base32::encode($security->generateRandomString($length));
+        $full = Base32::encode($security->generateRandomString($length));
+        return substr($full, 0, $length);
     }
 
     /**

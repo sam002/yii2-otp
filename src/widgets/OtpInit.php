@@ -5,27 +5,45 @@
  * Time: 4:22
  */
 
-namespace widgets;
+namespace sam002\otp\widgets;
 
 
 use dosamigos\qrcode\lib\Enum;
 use dosamigos\qrcode\QrCode;
 use sam002\otp\Otp;
+use Yii;
 use yii\base\InvalidConfigException;
-use yii\base\Widget;
+use yii\helpers\Html;
+use yii\widgets\InputWidget;
 use yii\validators\UrlValidator;
 
-class OtpInit extends Widget
+class OtpInit extends InputWidget
 {
+
+    /**
+     * @var string
+     */
+    public $component = 'otp';
+
+    /**
+     * @var bool|string
+     */
+    public $link = true;
+
     /**
      * @var array
      */
-    public $QrParams = [
+    public $QrParams;
+
+    /**
+     * @var array
+     */
+    private $defaultQrParams = [
         'outfile' => false,
-        'level' => Enum::QR_ECLEVEL_L,
+        'level' => Enum::QR_ECLEVEL_Q,
         'size' => 3,
         'margin' => 4,
-        'saveAndPrint' => false,
+        'save' => false,
         'type' => Enum::QR_FORMAT_PNG
     ];
 
@@ -37,24 +55,37 @@ class OtpInit extends Widget
     public function init()
     {
         parent::init();
+        $this->otp = Yii::$app->get($this->component)->getOtp();
+        $this->QrParams = array_merge($this->defaultQrParams, $this->QrParams);
     }
 
     public function run()
     {
         parent::run();
-        $this->renderWidget();
+        return $this->renderWidget();
     }
+
 
     /**
      * @return string
      * @throws InvalidConfigException
      */
-    private function renderWidget()
+    private function renderWidget($input = '')
     {
-        return $this->render('/init', [
-            'qr' => $this->generateQr($this->otp->getProvisioningUri()),
-            'code' => $this->otp->getSecret()
-        ]);
+        $imgSrc = "data:image/jpeg;base64,";
+        if($this->QrParams['type'] === Enum::QR_FORMAT_PNG) {
+            $imgSrc = "data:image/png;base64,";
+        }
+
+        echo '<div><img src=' . $imgSrc . base64_encode($this->generateQr($this->otp->getProvisioningUri())) . ' /></div>';
+
+        if ($this->link || is_string($this->link)) {
+            echo Html::a($this->link, $this->otp->getProvisioningUri());
+        }
+
+        echo $this->hasModel()
+            ? Html::activeHiddenInput($this->model, $this->attribute, $this->options)
+            : Html::passwordInput($this->name, $this->value, $this->options);
     }
 
     /**
@@ -64,12 +95,14 @@ class OtpInit extends Widget
      */
     private function generateQr($text = '')
     {
+        $image = null;
+
         $outfile = false;
         $level = Enum::QR_ECLEVEL_L;
         $size = 3;
         $margin = 4;
-        $saveAndPrint = false;
-        $type = Enum::QR_FORMAT_PNG;
+        $save = false;
+        $type = Enum::QR_FORMAT_JPG;
 
         foreach ($this->QrParams as $name => $param) {
             switch ($name) {
@@ -85,8 +118,8 @@ class OtpInit extends Widget
                 case 'margin':
                     $margin = $this->checkParamMargin($param);
                     break;
-                case 'saveAndPrint':
-                    $saveAndPrint = $this->checkParamSaveAndPrint($param);
+                case 'save':
+                    $save = $this->checkParamSave($param);
                     break;
                 case 'type':
                     $type = $this->checkParamType($param);
@@ -94,13 +127,29 @@ class OtpInit extends Widget
             }
         }
 
-        return QrCode::encode($text, $outfile, $level, $size, $margin, $saveAndPrint, $type);
+        QrCode::encode($text, $outfile, $level, $size, $margin, false, $type);
+        if(is_file($outfile)) {
+            $image = file_get_contents($outfile);
+        }
+        if(!$save) {
+            unlink($outfile);
+        }
+        return $image;
     }
 
     private function checkParamOutfile($outfile)
     {
-        if (!is_bool($outfile)) {
-            throw new InvalidConfigException('OtpInit::$QrParams[\'outfile\'] is not boolean');
+        if(is_string($outfile) && !is_dir(dirname($outfile))) {
+            throw new InvalidConfigException('OtpInit::$QrParams[\'outfile\'] error ' . dirname($outfile) . ' is not dir');
+        } elseif (!is_string($outfile) && $outfile !== false) {
+            throw new InvalidConfigException('OtpInit::$QrParams[\'outfile\'] is not false or file path');
+        }
+        if($outfile === false) {
+            $outfile = Yii::$app->runtimePath . '/temporaryQR/' . uniqid();
+            $dir = dirname($outfile);
+            if (!is_dir($dir)) {
+                mkdir($dir);
+            }
         }
         return $outfile;
     }
@@ -113,7 +162,7 @@ class OtpInit extends Widget
             Enum::QR_ECLEVEL_Q,
             Enum::QR_ECLEVEL_H,
         ];
-        if (in_array($level, $qrLevels, true)) {
+        if (!in_array($level, $qrLevels, true)) {
             throw new InvalidConfigException('OtpInit::$QrParams[\'level\'] is not QR_ECLEVEL_*');
         }
         return $level;
@@ -136,10 +185,10 @@ class OtpInit extends Widget
     }
 
 
-    private function checkParamSaveAndPrint($saveAndPrint)
+    private function checkParamSave($saveAndPrint)
     {
         if (!is_bool($saveAndPrint)) {
-            throw new InvalidConfigException('OtpInit::$QrParams[\'saveAndPrint\'] is not boolean');
+            throw new InvalidConfigException('OtpInit::$QrParams[\'save\'] is not boolean');
         }
         return $saveAndPrint;
     }
@@ -149,11 +198,9 @@ class OtpInit extends Widget
         $qrTypes = [
             Enum::QR_FORMAT_PNG,
             Enum::QR_FORMAT_JPG,
-            Enum::QR_FORMAT_RAW,
-            Enum::QR_FORMAT_TEXT
         ];
-        if (in_array($type, $qrTypes, true)) {
-            throw new InvalidConfigException('OtpInit::$QrParams[\'type\'] is not Enum::QR_FORMAT_*');
+        if (!in_array($type, $qrTypes, true)) {
+            throw new InvalidConfigException('OtpInit::$QrParams[\'type\'] is not Enum::QR_FORMAT_PNG or Enum::QR_FORMAT_JPG');
         }
         return $type;
     }
