@@ -7,11 +7,11 @@
 
 namespace sam002\otp;
 
+use Base32\Base32;
+use sam002\otp\helpers\OtpHelper;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
-use dosamigos\qrcode\lib\Enum;
 use yii\validators\UrlValidator;
-use sam002\helpers\OtpHelper;
 
 /**
  * Class Collection is a single otp module with initialization and code-validation
@@ -26,7 +26,8 @@ use sam002\helpers\OtpHelper;
  *          'digits' => 6,
  *          'digets' => 'sha1',
  *          'lable' => 'yii2-otp',
- *          'imgLabelUrl' => Yii
+ *          'imgLabelUrl' => Yii,
+ *          'secretLength' => 16
  *     ]
  *     ...
  * ]
@@ -40,6 +41,9 @@ class Otp extends Component
 
     const ALGORITHM_TOTP = 'totp';
     const ALGORITHM_HOTP = 'hotp';
+
+    const SECRET_LENGTH_MIN = 8;
+    const SECRET_LENGTH_MAX = 1024;
 
     /**
      * @var string
@@ -64,7 +68,7 @@ class Otp extends Component
     /**
      * @var int
      */
-    public $counter = 0;
+    public $counter = null;
 
     /**
      * @var string
@@ -77,25 +81,23 @@ class Otp extends Component
     public $imgLabelUrl = null;
 
     /**
-     * @var array
+     * @var int
      */
-    public $qrParams = [
-        'outfile' => false,
-        'level' => Enum::QR_ECLEVEL_L,
-        'size' => 3,
-        'margin' => 4,
-        'saveAndPrint' => false,
-        'type' => Enum::QR_FORMAT_PNG
-    ];
+    public $secretLength = 64;
 
+    private $_secret = null;
+
+    /**
+     * @var \OTPHP\OTP
+     */
     private $otp = null;
 
     public function init()
     {
         parent::init();
-        if ($this->algorithm === self::ALGORITHM_HOTP) {
+        if ($this->algorithm === self::ALGORITHM_TOTP) {
             $this->otp = OtpHelper::getTotp($this->lable, $this->digits, $this->digets, $this->interval);
-        } elseif ($this->algorithm === self::ALGORITHM_TOTP) {
+        } elseif ($this->algorithm === self::ALGORITHM_HOTP) {
             $this->otp = OtpHelper::getHotp($this->lable, $this->digits, $this->digets, $this->counter);
         } else {
             throw new InvalidConfigException('otp::$algorithm = \"' . $this->algorithm . '\" not allowed, only Otp::ALGORITHM_TOTP or Otp::ALGORITHM_HOTP');
@@ -111,32 +113,43 @@ class Otp extends Component
         }
     }
 
-    private function checkQrParams()
+    /**
+     * @return \OTPHP\OTP
+     */
+    public function getOtp()
     {
-        if(!is_array($this->qrParams) || empty($this->qrParams)) {
+        $this->otp->setSecret($this->getSecret());
+        return $this->otp;
+    }
 
+    /**
+     * @return null|string
+     * @throws InvalidConfigException
+     */
+    public function getSecret()
+    {
+        if (!is_numeric($this->secretLength) || $this->secretLength < self::SECRET_LENGTH_MIN || $this->secretLength > self::SECRET_LENGTH_MAX) {
+            throw new InvalidConfigException('otp::$length only integer, min='. self::SECRET_LENGTH_MIN .'and max=' . self::SECRET_LENGTH_MAX);
         }
-        foreach ($this->qrParams as $name => $param) {
-            switch ($name) {
-                case 'outfile':
-                    $this->checkParamOutfile($param);
-                    break;
-                case 'level':
-                    $this->checkParamLevel($param);
-                    break;
-                case 'size':
-                    $this->checkParamSize($param);
-                    break;
-                case 'margin':
-                    $this->checkParamMargin($param);
-                    break;
-                case 'saveAndPrint':
-                    $this->checkParamSaveAndPrint($param);
-                    break;
-                case 'type':
-                    $this->checkParamType($param);
-                    break;
-            }
+        if (empty($this->_secret)) {
+            $this->_secret = OtpHelper::generateSecret($this->secretLength);
         }
+        return $this->_secret;
+    }
+
+    public function setSecret($value)
+    {
+        if(strlen($value) !== $this->secretLength) {
+            throw new InvalidConfigException('Otp::setSecret length is not equal to ' . $this->secretLength . ' ([\'length\'] component settenings)');
+        } elseif ( strlen(Base32::decode($value)) < 1 ) {
+            throw new InvalidConfigException('Otp::setSecret incorect, encode as Base32');
+        }
+        $this->otp->setSecret($value);
+        $this->_secret = $value;
+    }
+
+    public function valideteCode($code, $window = 0)
+    {
+        return $this->otp->verify($code, $this->counter, $window);
     }
 }
