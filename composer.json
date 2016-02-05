@@ -32,5 +32,10 @@
     "psr-4": {
       "sam002\\otp\\": "src"
     }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "release/0.x"
+    }
   }
 }
