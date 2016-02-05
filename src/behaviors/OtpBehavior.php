@@ -7,10 +7,13 @@
 
 namespace sam002\otp\behaviors;
 
+use Base32\Base32;
+use Yii;
 use sam002\otp\Otp;
 use yii\base\Behavior;
 use yii\base\InvalidConfigException;
-use yii\base\Security;
+use yii\behaviors\AttributeBehavior;
+use yii\db\BaseActiveRecord;
 
 
 /**
@@ -24,7 +27,8 @@ use yii\base\Security;
  *  return [
  *       'otp' => [
  *           'class' => OtpBehavior::className(),
- *           'component' => 'componentName'
+ *           'component' => 'componentName',
+ *           'window' => 0
  *       ],
  *  ];
  * }
@@ -36,34 +40,58 @@ use yii\base\Security;
  */
 class OtpBehavior extends Behavior
 {
+    /**
+     * @var string
+     */
+    public $component = 'otp';
 
-    public $type;
-    public $column;
-    public $counter = null;
+    /**
+     * @var string
+     */
+    public $secretAttribute = 'secret';
 
-    private $_otpSecret;
-    private $_otpCode;
+    /**
+     * @var string
+     */
+    public $countAttribute = 'count';
 
+    /**
+     * @var int
+     */
+    public $window = 0;
 
-    public function setOtpUrl($value)
+    /**
+     * @var Otp
+     */
+    private $otp = null;
+
+    public function init()
     {
-        $this->otp->getProvisioningUri();
+        parent::init();
+        $this->otp = Yii::$app->get($this->component);
+
     }
 
-    public function getOtpUrl()
+
+    public function setOtpSecret($value)
     {
-        return $this->_otpUrl;
-        //if (!$this->owner->getIsNewRecord()
+        $this->otp->setSecret($value);
     }
 
-    public function validate($code, $window = 0)
+    public function getOtpSecret()
     {
-        ;
+        if (isset($this->owner->{$this->secretAttribute})) {
+            $this->otp->setSecret($this->owner->{$this->secretAttribute});
+        }
+        return $this->otp->getSecret();
     }
 
-    //TODO validate
-    //TODO generate
-    //TODO save secrete
-    //TODO increment counter
+    public function validateOtpSecret($code)
+    {
+        if ($this->getOtpSecret()) {
+            return $this->otp->valideteCode($code, $this->window);
+        }
+        return false;
+    }
 
 }
