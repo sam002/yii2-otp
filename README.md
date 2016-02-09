@@ -1,7 +1,7 @@
 # yii2-otp
 
 
-[![Latest Version](https://img.shields.io/github/tag/sam002/yii2-otp.svg?style=flat-square&label=release)](https://github.com/2amigos/yii2-date-picker-widget/tags)
+[![Latest Version](https://img.shields.io/github/tag/sam002/yii2-otp.svg?style=flat-square&label=releas)](https://github.com/sam002/yii2-otp/tags)
 [![Software License](https://img.shields.io/badge/license-LGPL3-brightgreen.svg?style=flat-square)](LICENSE.md)
 
 YII2 extension  for generating one time passwords according to RFC 4226 (HOTP Algorithm) and the RFC 6238 (TOTP Algorithm)
