@@ -20,7 +20,7 @@
   ],
 
   "require": {
-    "yiisoft/yii2": "*",
+    "yiisoft/yii2": "2.0.*",
     "spomky-labs/otphp": "^6.0",
     "2amigos/yii2-qrcode-helper" : "~1.0"
   },
@@ -31,11 +31,6 @@
   "autoload": {
     "psr-4": {
       "sam002\\otp\\": "src"
-    }
-  },
-  "extra": {
-    "branch-alias": {
-      "dev-master": "release/0.x"
     }
   }
 }
