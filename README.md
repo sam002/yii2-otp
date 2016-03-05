@@ -9,6 +9,7 @@ YII2 extension  for generating one time passwords according to RFC 4226 (HOTP Al
 
 Installation
 ------------
+
 The preferred way to install this extension is through [composer](http://getcomposer.org/download/).
 
 Either run
@@ -24,8 +25,10 @@ or add
 
 to the require section of your application's `composer.json` file.
 
+
 Usage
 -----
+
 After extension is installed you need to setup auth client collection application component:
 
 **Configure**
@@ -150,11 +153,13 @@ Further Information
 - [otphp docs](https://github.com/Spomky-Labs/otphp/tree/master/doc)
 - [yii2-qrcode-helper](https://github.com/2amigos/yii2-qrcode-helper)
 
+
 Credits
 -------
 
 - [sam002](https://github.com/sam002)
 - [All Contributors](../../contributors)
+
 
 License
 -------
