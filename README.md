@@ -2,7 +2,7 @@
 [![Code Climate](https://codeclimate.com/github/sam002/yii2-otp/badges/gpa.svg)](https://codeclimate.com/github/sam002/yii2-otp)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/cb3e45a9-f9a3-4843-bfe5-56a1cc7883d2/mini.png)](https://insight.sensiolabs.com/projects/cb3e45a9-f9a3-4843-bfe5-56a1cc7883d2)
 
-[![Latest Version](https://img.shields.io/github/tag/sam002/yii2-otp.svg?style=flat-square&label=release)](https://github.com/2amigos/yii2-date-picker-widget/tags)
+[![Latest Version](https://img.shields.io/github/tag/sam002/yii2-otp.svg?style=flat-square&label=releas)](https://github.com/sam002/yii2-otp/tags)
 [![Software License](https://img.shields.io/badge/license-LGPL3-brightgreen.svg?style=flat-square)](LICENSE.md)
 
 YII2 extension  for generating one time passwords according to RFC 4226 (HOTP Algorithm) and the RFC 6238 (TOTP Algorithm)
@@ -10,6 +10,7 @@ YII2 extension  for generating one time passwords according to RFC 4226 (HOTP Al
 
 Installation
 ------------
+
 The preferred way to install this extension is through [composer](http://getcomposer.org/download/).
 
 Either run
@@ -25,8 +26,10 @@ or add
 
 to the require section of your application's `composer.json` file.
 
+
 Usage
 -----
+
 After extension is installed you need to setup auth client collection application component:
 
 **Configure**
@@ -151,11 +154,13 @@ Further Information
 - [otphp docs](https://github.com/Spomky-Labs/otphp/tree/master/doc)
 - [yii2-qrcode-helper](https://github.com/2amigos/yii2-qrcode-helper)
 
+
 Credits
 -------
 
 - [sam002](https://github.com/sam002)
 - [All Contributors](../../contributors)
+
 
 License
 -------
