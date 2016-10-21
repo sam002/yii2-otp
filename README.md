@@ -1,5 +1,6 @@
 # yii2-otp
-
+[![Code Climate](https://codeclimate.com/github/sam002/yii2-otp/badges/gpa.svg)](https://codeclimate.com/github/sam002/yii2-otp)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/cb3e45a9-f9a3-4843-bfe5-56a1cc7883d2/mini.png)](https://insight.sensiolabs.com/projects/cb3e45a9-f9a3-4843-bfe5-56a1cc7883d2)
 
 [![Latest Version](https://img.shields.io/github/tag/sam002/yii2-otp.svg?style=flat-square&label=releas)](https://github.com/sam002/yii2-otp/tags)
 [![Software License](https://img.shields.io/badge/license-LGPL3-brightgreen.svg?style=flat-square)](LICENSE.md)
@@ -15,12 +16,12 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```
-composer require sam002/yii2-otp:~0.1
+composer require sam002/yii2-otp:~0.1.1
 ```
 or add
 
 ```json
-"sam002/yii2-otp" : "~0.1"
+"sam002/yii2-otp" : "~0.1.1"
 ```
 
 to the require section of your application's `composer.json` file.
