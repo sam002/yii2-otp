@@ -18,16 +18,11 @@
       "role": "Developer"
     }
   ],
-
   "require": {
-    "yiisoft/yii2": "2.0.*",
+    "yiisoft/yii2": "^2.0.1",
     "spomky-labs/otphp": "^6.0",
-    "2amigos/yii2-qrcode-helper" : "~1.0"
+    "2amigos/yii2-qrcode-helper" : "^1.0.2"
   },
-  "require-dev": {
-    "phpunit/phpunit": "4.*"
-  },
-
   "autoload": {
     "psr-4": {
       "sam002\\otp\\": "src"
