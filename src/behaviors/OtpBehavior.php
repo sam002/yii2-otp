@@ -7,13 +7,9 @@
 
 namespace sam002\otp\behaviors;
 
-use Base32\Base32;
 use Yii;
 use sam002\otp\Otp;
 use yii\base\Behavior;
-use yii\base\InvalidConfigException;
-use yii\behaviors\AttributeBehavior;
-use yii\db\BaseActiveRecord;
 
 
 /**

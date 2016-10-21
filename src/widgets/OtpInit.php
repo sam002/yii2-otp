@@ -10,12 +10,10 @@ namespace sam002\otp\widgets;
 
 use dosamigos\qrcode\lib\Enum;
 use dosamigos\qrcode\QrCode;
-use sam002\otp\Otp;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\helpers\Html;
 use yii\widgets\InputWidget;
-use yii\validators\UrlValidator;
 
 class OtpInit extends InputWidget
 {
