@@ -24,8 +24,8 @@ use yii\validators\UrlValidator;
  *          'class' => 'sam002\otp\Otp',
  *          'algorithm' => sam002\otp\Collection::ALGORITHM_HOTP
  *          'digits' => 6,
- *          'digets' => 'sha1',
- *          'lable' => 'yii2-otp',
+ *          'digest' => 'sha1',
+ *          'label' => 'yii2-otp',
  *          'imgLabelUrl' => Yii,
  *          'secretLength' => 16
  *     ]
@@ -58,7 +58,7 @@ class Otp extends Component
     /**
      * @var string
      */
-    public $digets = 'sha1';
+    public $digest = 'sha1';
 
     /**
      * @var int
@@ -73,7 +73,7 @@ class Otp extends Component
     /**
      * @var string
      */
-    public $lable = 'yii2-otp';
+    public $label = 'yii2-otp';
 
     /**
      * @var null
@@ -96,9 +96,9 @@ class Otp extends Component
     {
         parent::init();
         if ($this->algorithm === self::ALGORITHM_TOTP) {
-            $this->otp = OtpHelper::getTotp($this->lable, $this->digits, $this->digets, $this->interval);
+            $this->otp = OtpHelper::getTotp($this->label, $this->digits, $this->digest, $this->interval);
         } elseif ($this->algorithm === self::ALGORITHM_HOTP) {
-            $this->otp = OtpHelper::getHotp($this->lable, $this->digits, $this->digets, $this->counter);
+            $this->otp = OtpHelper::getHotp($this->label, $this->digits, $this->digest, $this->counter);
         } else {
             throw new InvalidConfigException('otp::$algorithm = \"' . $this->algorithm . '\" not allowed, only Otp::ALGORITHM_TOTP or Otp::ALGORITHM_HOTP');
         }

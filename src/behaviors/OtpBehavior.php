@@ -36,36 +36,28 @@ use yii\base\Behavior;
  */
 class OtpBehavior extends Behavior
 {
-    /**
-     * @var string
-     */
+    /** @var string  */
     public $component = 'otp';
 
-    /**
-     * @var string
-     */
+    /** @var string  */
     public $secretAttribute = 'secret';
 
-    /**
-     * @var string
-     */
+    /** @var string  */
+    public $codeAttribute = 'code';
+
+    /** @var string  */
     public $countAttribute = 'count';
 
-    /**
-     * @var int
-     */
+    /** @var int  */
     public $window = 0;
 
-    /**
-     * @var Otp
-     */
+    /** @var Otp  */
     private $otp = null;
 
     public function init()
     {
         parent::init();
         $this->otp = Yii::$app->get($this->component);
-
     }
 
 
