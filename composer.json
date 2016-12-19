@@ -19,7 +19,7 @@
     }
   ],
   "require": {
-    "yiisoft/yii2": "^2.0.1",
+    "yiisoft/yii2": "*",
     "spomky-labs/otphp": "^6.0",
     "2amigos/yii2-qrcode-helper" : "^1.0.2"
   },
