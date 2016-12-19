@@ -27,36 +27,36 @@ class OtpHelper
     }
 
     /**
-     * @param string $lable
+     * @param string $label
      * @param int $digits
-     * @param string $digets
+     * @param string $digest
      * @param int $interval
      * @return TOTP
      */
-    static public function getTotp($lable = '', $digits = 6, $digets = 'sha1', $interval = 30)
+    static public function getTotp($label = '', $digits = 6, $digest = 'sha1', $interval = 30)
     {
         $totp = new TOTP();
-        $totp->setLabel($lable)
+        $totp->setLabel($label)
             ->setDigits($digits)
-            ->setDigest($digets)
+            ->setDigest($digest)
             ->setInterval($interval);
 
         return $totp;
     }
 
     /**
-     * @param string $lable
+     * @param string $label
      * @param int $digits
-     * @param string $digets
+     * @param string $digest
      * @param int $counter
      * @return HOTP
      */
-    static public function getHotp($lable = '', $digits = 6, $digets = 'sha1', $counter = 0)
+    static public function getHotp($label = '', $digits = 6, $digest = 'sha1', $counter = 0)
     {
         $totp = new HOTP();
-        $totp->setLabel($lable)
+        $totp->setLabel($label)
             ->setDigits($digits)
-            ->setDigest($digets)
+            ->setDigest($digest)
             ->setCounter($counter);
 
         return $totp;
