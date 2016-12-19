@@ -10,7 +10,6 @@ namespace sam002\otp\behaviors;
 use Yii;
 use sam002\otp\Otp;
 use yii\base\Behavior;
-use yii\base\Event;
 use yii\db\BaseActiveRecord;
 
 

@@ -85,7 +85,8 @@ class Otp extends Component
      */
     public $secretLength = 64;
 
-    private $_secret = null;
+    private $secret = null;
+
 
     /**
      * @var \OTPHP\OTP
@@ -131,10 +132,10 @@ class Otp extends Component
         if (!is_numeric($this->secretLength) || $this->secretLength < self::SECRET_LENGTH_MIN || $this->secretLength > self::SECRET_LENGTH_MAX) {
             throw new InvalidConfigException('otp::$length only integer, min='. self::SECRET_LENGTH_MIN .'and max=' . self::SECRET_LENGTH_MAX);
         }
-        if (empty($this->_secret)) {
-            $this->_secret = OtpHelper::generateSecret($this->secretLength);
+        if (empty($this->secret)) {
+            $this->secret = OtpHelper::generateSecret($this->secretLength);
         }
-        return $this->_secret;
+        return $this->secret;
     }
 
     public function setSecret($value)
@@ -145,7 +146,7 @@ class Otp extends Component
             throw new InvalidConfigException('Otp::setSecret incorect, encode as Base32');
         }
         $this->otp->setSecret($value);
-        $this->_secret = $value;
+        $this->secret = $value;
     }
 
     public function valideteCode($code, $window = 0)

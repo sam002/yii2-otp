@@ -57,7 +57,6 @@ class OtpInit extends InputWidget
         parent::init();
         /** @var Otp $component */
         $component = Yii::$app->get($this->component);
-//        $component->setSecret($component->getSecret());
         $this->otp = $component->getOtp();
         $this->QrParams = array_merge($this->defaultQrParams, $this->QrParams);
     }
@@ -73,7 +72,7 @@ class OtpInit extends InputWidget
      * @return string
      * @throws InvalidConfigException
      */
-    private function renderWidget($input = '')
+    private function renderWidget()
     {
         $imgSrc = "data:image/jpeg;base64,";
         if($this->QrParams['type'] === Enum::QR_FORMAT_PNG) {
@@ -86,11 +85,12 @@ class OtpInit extends InputWidget
             echo Html::a($this->link, $this->otp->getProvisioningUri());
         }
 
-        $this->model->setAttribute($this->attribute, $this->otp->getSecret());
-
-        echo $this->hasModel()
-            ? Html::activeHiddenInput($this->model, $this->attribute, $this->options)
-            : Html::passwordInput($this->name, $this->value, $this->options);
+        if ($this->hasModel()) {
+            $this->model->setAttribute($this->attribute, $this->otp->getSecret());
+            echo Html::activeHiddenInput($this->model, $this->attribute, $this->options);
+        } else {
+            echo Html::passwordInput($this->name, $this->value, $this->options);
+        }
     }
 
     /**
@@ -132,7 +132,6 @@ class OtpInit extends InputWidget
             }
         }
 
-        //todo catch exceptions
         QrCode::encode($text, $outfile, $level, $size, $margin, false, $type);
         if(is_file($outfile)) {
             $image = file_get_contents($outfile);
