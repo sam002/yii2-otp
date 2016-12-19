@@ -10,8 +10,10 @@ namespace sam002\otp\widgets;
 
 use dosamigos\qrcode\lib\Enum;
 use dosamigos\qrcode\QrCode;
+use sam002\otp\Otp;
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\helpers\FileHelper;
 use yii\helpers\Html;
 use yii\widgets\InputWidget;
 
@@ -53,7 +55,10 @@ class OtpInit extends InputWidget
     public function init()
     {
         parent::init();
-        $this->otp = Yii::$app->get($this->component)->getOtp();
+        /** @var Otp $component */
+        $component = Yii::$app->get($this->component);
+//        $component->setSecret($component->getSecret());
+        $this->otp = $component->getOtp();
         $this->QrParams = array_merge($this->defaultQrParams, $this->QrParams);
     }
 
@@ -80,6 +85,8 @@ class OtpInit extends InputWidget
         if ($this->link || is_string($this->link)) {
             echo Html::a($this->link, $this->otp->getProvisioningUri());
         }
+
+        $this->model->setAttribute($this->attribute, $this->otp->getSecret());
 
         echo $this->hasModel()
             ? Html::activeHiddenInput($this->model, $this->attribute, $this->options)
@@ -125,6 +132,7 @@ class OtpInit extends InputWidget
             }
         }
 
+        //todo catch exceptions
         QrCode::encode($text, $outfile, $level, $size, $margin, false, $type);
         if(is_file($outfile)) {
             $image = file_get_contents($outfile);
@@ -146,7 +154,7 @@ class OtpInit extends InputWidget
             $outfile = Yii::$app->runtimePath . '/temporaryQR/' . uniqid();
             $dir = dirname($outfile);
             if (!is_dir($dir)) {
-                mkdir($dir);
+                FileHelper::createDirectory($dir);
             }
         }
         return $outfile;

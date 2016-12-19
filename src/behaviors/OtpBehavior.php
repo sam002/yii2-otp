@@ -10,6 +10,8 @@ namespace sam002\otp\behaviors;
 use Yii;
 use sam002\otp\Otp;
 use yii\base\Behavior;
+use yii\base\Event;
+use yii\db\BaseActiveRecord;
 
 
 /**
@@ -51,8 +53,48 @@ class OtpBehavior extends Behavior
     /** @var int  */
     public $window = 0;
 
-    /** @var Otp  */
+    /** @var Otp */
     private $otp = null;
+
+    /** @var BaseActiveRecord */
+    public $owner;
+
+    /**
+     * @inheritdoc
+     */
+    public function events()
+    {
+        return [
+            BaseActiveRecord::EVENT_INIT => 'initSecret',
+            BaseActiveRecord::EVENT_BEFORE_VALIDATE => 'confirmSecret'
+        ];
+    }
+
+    /**
+     * Init secret attribute
+     */
+    public function initSecret()
+    {
+        $secret = $this->owner->{$this->secretAttribute};
+        if (!empty($secret)) {
+            $this->otp->setSecret($secret);
+        }
+    }
+
+    /**
+     * Confirm secret by code
+     */
+    public function confirmSecret()
+    {
+        $secret = $this->owner->{$this->secretAttribute};
+        if (empty($secret)) {
+            $this->owner->addError($this->codeAttribute, Yii::t('yii', 'The secret is empty.'));
+        }
+        $this->otp->setSecret($secret);
+        if (!$this->secretConfirmed()) {
+            $this->owner->addError($this->codeAttribute, Yii::t('yii', 'The code is incorrect.'));
+        }
+    }
 
     public function init()
     {
@@ -60,26 +102,9 @@ class OtpBehavior extends Behavior
         $this->otp = Yii::$app->get($this->component);
     }
 
-
-    public function setOtpSecret($value)
+    private function secretConfirmed()
     {
-        $this->otp->setSecret($value);
+        $code = $this->owner->{$this->codeAttribute};
+        return $code !== null && $this->otp->valideteCode($code, $this->window);
     }
-
-    public function getOtpSecret()
-    {
-        if (isset($this->owner->{$this->secretAttribute})) {
-            $this->otp->setSecret($this->owner->{$this->secretAttribute});
-        }
-        return $this->otp->getSecret();
-    }
-
-    public function validateOtpSecret($code)
-    {
-        if ($this->getOtpSecret()) {
-            return $this->otp->valideteCode($code, $this->window);
-        }
-        return false;
-    }
-
 }
