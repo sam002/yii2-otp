@@ -52,8 +52,8 @@ use sam002\otp\Otp;
         //  Algorithm for hashing
         'digets' => 'sha1',
         
-        // Lable of application
-        'lable' => 'yii2-otp',
+        // Label of application
+        'label' => 'yii2-otp',
         
         // Uri to image (application icon)
         'imgLabelUrl' => Yii::to('/icon.png'),
