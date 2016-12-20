@@ -22,7 +22,7 @@ use yii\validators\UrlValidator;
  *  'components' => [
  *      'otp' => [
  *          'class' => 'sam002\otp\Otp',
- *          'algorithm' => sam002\otp\Collection::ALGORITHM_HOTP
+ *          'algorithm' => sam002\otp\Otp::ALGORITHM_TOTP
  *          'digits' => 6,
  *          'digest' => 'sha1',
  *          'label' => 'yii2-otp',
