@@ -57,6 +57,12 @@ class OtpInit extends InputWidget
         parent::init();
         /** @var Otp $component */
         $component = Yii::$app->get($this->component);
+
+        $secret = $this->model->{$this->attribute};
+        if (!empty($secret)) {
+            $component->setSecret($secret);
+        }
+
         $this->otp = $component->getOtp();
         $this->QrParams = array_merge($this->defaultQrParams, $this->QrParams);
     }
@@ -85,12 +91,10 @@ class OtpInit extends InputWidget
             echo Html::a($this->link, $this->otp->getProvisioningUri());
         }
 
-        if ($this->hasModel()) {
-            $this->model->setAttribute($this->attribute, $this->otp->getSecret());
-            echo Html::activeHiddenInput($this->model, $this->attribute, $this->options);
-        } else {
-            echo Html::passwordInput($this->name, $this->value, $this->options);
+        if ($this->hasModel() && empty($this->model->getAttributes([$this->attribute]))) {
+            $this->model->setAttributes([$this->attribute => $this->otp->getSecret()]);
         }
+        echo Html::activeHiddenInput($this->model, $this->attribute, $this->options);
     }
 
     /**
