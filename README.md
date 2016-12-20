@@ -16,12 +16,12 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```
-composer require sam002/yii2-otp:~0.1.1
+composer require sam002/yii2-otp:~1.0.1
 ```
 or add
 
 ```json
-"sam002/yii2-otp" : "~0.1.1"
+"sam002/yii2-otp" : "~1.0.1"
 ```
 
 to the require section of your application's `composer.json` file.
@@ -42,9 +42,9 @@ use sam002\otp\Otp;
 
 'components' => [
     'otp' => [
-        'class' => 'Otp',
+        'class' => Otp::className(),
         // 'totp' only now
-        'algorithm' => sam002\otp\Collection::ALGORITHM_TOTP
+        'algorithm' => sam002\otp\Otp::ALGORITHM_TOTP,
         
         // length of code
         'digits' => 6,
@@ -59,7 +59,8 @@ use sam002\otp\Otp;
         'imgLabelUrl' => Yii::to('/icon.png'),
         
         // Betwen 8 and 1024
-        'secretLength' => 64
+        'secretLength' => 64,
+        // Time interval in seconds, must be at least 1
         'interval'
     ],
 ...
@@ -83,6 +84,8 @@ use sam002\otp\behaviors\OtpBehavior;
         
         // column|property name for get and set secure phrase
         //'secretAttribute' => 'secret'
+        // column|property name for get code and confirm secret
+        //'codeAttribute' => 'secret'
         
         //Window in time for check authorithation (current +/- window*interval) 
         //'window' => 0
@@ -97,7 +100,7 @@ Widget for generate init QR-code
 ```php
 use sam002\otp\widgets\OtpInit;
 
-<?php echo $form->field($model, 'otpSecret')->widget(
+<?php echo $form->field($model, 'secret')->widget(
                     OtpInit::className() ,[
                         'component'=>'otp',
                         
@@ -120,33 +123,6 @@ use sam002\otp\widgets\OtpInit;
                 ]); ?>
 ```
 
-**Validation. Additional examples**
-
-```php
-// login view
-<?php
-            ...
-            <?php echo $form->field($model, 'username') ?>
-            <?php echo $form->field($model, 'otp')->passwordInput() ?>
-            ...
-
-// login form model
-<?php
-     /**
-     * Validates the OTP.
-     */
-    public function validateOtp()
-    {
-        if (!$this->hasErrors()) {
-            $user = $this->getUser();
-            if (!$user || !$user->validateOtpSecret($this->otp)) {
-                $this->addError('otp', Yii::t('common', 'Incorrect code.'));
-            }
-        }
-    }
-```
-
-
 Further Information
 -------------------
 - [About HOTP](https://en.wikipedia.org/wiki/HMAC-based_One-time_Password_Algorithm)
@@ -165,5 +141,5 @@ Credits
 License
 -------
 
-The LGPLv3 License. Please see [License File](LICENSE.md) for more information.
+The LGPLv3 License. Please see [License File](LICENSE) for more information.
 
