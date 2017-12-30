@@ -37,7 +37,9 @@ class OtpHelper
     public static function getTotp($label = '', $digits = 6, $digest = 'sha1', $interval = 30, $issuer='')
     {
         $totp = new TOTP($label, null, $interval, $digest, $digits);
-        $totp->setIssuer($issuer);
+        if(!empty($issuer)) {
+            $totp->setIssuer($issuer);
+        }
 
         return $totp;
     }
@@ -53,7 +55,9 @@ class OtpHelper
     public static function getHotp($label = '', $digits = 6, $digest = 'sha1', $counter = 0, $issuer='')
     {
         $hotp = new HOTP($label, null, $counter, $digest, $digits);
-        $hotp->setIssuer($issuer);
+        if(!empty($issuer)) {
+            $hotp->setIssuer($issuer);
+        }
 
         return $hotp;
     }

@@ -7,7 +7,7 @@
 
 namespace sam002\otp;
 
-use Base32\Base32;
+use ParagonIE\ConstantTime\Base32;
 use sam002\otp\helpers\OtpHelper;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -74,7 +74,7 @@ class Otp extends Component
     /**
      * @var string
      */
-    public $issuer = null;
+    public $issuer = '';
 
     /**
      * @var string
@@ -125,7 +125,7 @@ class Otp extends Component
      */
     public function getOtp()
     {
-        $this->otp->setParameter('secret', $this->getSecret());
+        $this->otp->setParameter('secret', strtoupper($this->getSecret()));
         return $this->otp;
     }
 
@@ -148,15 +148,19 @@ class Otp extends Component
     {
         if(strlen($value) !== $this->secretLength) {
             throw new InvalidConfigException('Otp::setSecret length is not equal to ' . $this->secretLength . ' ([\'length\'] component settenings)');
-        } elseif ( strlen(Base32::decode($value)) < 1 ) {
+        } elseif ( strlen(Base32::decodeUpper(strtoupper($value))) < 1 ) {
             throw new InvalidConfigException('Otp::setSecret incorect, encode as Base32');
         }
-        $this->otp->setParameter('secret', $value);
+        $this->otp->setParameter('secret', strtoupper($value));
         $this->secret = $value;
     }
 
-    public function valideteCode($code, $window = 0)
+    public function valideteCode($code, $window = null)
     {
+        if ($this->counter === 0 && $this->algorithm === self::ALGORITHM_TOTP) {
+            //todo add time configuration
+            $this->counter = null;
+        }
         return $this->otp->verify($code, $this->counter, $window);
     }
 }
