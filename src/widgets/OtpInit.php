@@ -54,9 +54,9 @@ class OtpInit extends InputWidget
 
     public function init()
     {
-        parent::init();
         /** @var Otp $component */
         $component = Yii::$app->get($this->component);
+        parent::init();
 
         $secret = $this->model->{$this->attribute};
         if (!empty($secret)) {
@@ -91,7 +91,10 @@ class OtpInit extends InputWidget
             echo Html::a($this->link, $this->otp->getProvisioningUri());
         }
 
-        if ($this->hasModel() && empty($this->model->getAttributes([$this->attribute]))) {
+        if ($this->hasModel()
+            && $this->model->hasProperty($this->attribute)
+            && empty($this->model->{$this->attribute})
+        ) {
             $this->model->setAttributes([$this->attribute => $this->otp->getSecret()]);
         }
         echo Html::activeHiddenInput($this->model, $this->attribute, $this->options);
