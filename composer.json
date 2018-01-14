@@ -26,7 +26,7 @@
   ],
   "require": {
     "spomky-labs/otphp": "^8.3",
-    "2amigos/yii2-qrcode-helper" : "^1.0.2"
+    "2amigos/qrcode-library" : "^1.1.0"
   },
   "require-dev": {
     "yiisoft/yii2-codeception": "~2.0.0",

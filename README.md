@@ -95,7 +95,8 @@ use sam002\otp\behaviors\OtpBehavior;
 ```
 
 **Widget use**
-Widget for generate init QR-code
+Widget for generate init QR-code.
+Read more about QrParams in the [qrcode-library](https://github.com/2amigos/qrcode-library).
 
 ```php
 use sam002\otp\widgets\OtpInit;
@@ -108,11 +109,35 @@ use sam002\otp\widgets\OtpInit;
                         'link' => 'ADD OTP BY LINK',
                         
                         'QrParams' => [
-                            // pixels per cell
-                            'size' => 3,
+                            // pixels width
+                            'size' => 300,
                             
                             // margin around QR-code
-                            'margin' => 5,
+                            'margin' => 10,
+                            
+                            // Path to logo on image
+                            'logo' => '/icon.png',
+                            
+                            // Width logo on image
+                            'logoWidth' => 50,
+                            
+                            // RGB color
+                            'foregroundColor' => [0,0,0],
+                            
+                            // RGB color
+                            'backgroundColor' => [255,255,255],
+                            
+                            // Qulity of QR: LOW, MEDIUM, HIGHT, QUARTILE
+                            'level' => ErrorCorrectionLevelInterface::HIGH,
+                            
+                            // Image format: PNG, JPG, SVG, EPS
+                            'type' => PngWriter::class,
+                            
+                            // Locale
+                            'encoding' => 'UTF-8',
+                            
+                            // Text on image under QR code
+                            'label' => 'QR code',
                             
                             // by default image create and save at Yii::$app->runtimePath . '/temporaryQR/'
                             'outfile' => '/tmp/'.uniqid(),
@@ -128,7 +153,7 @@ Further Information
 - [About HOTP](https://en.wikipedia.org/wiki/HMAC-based_One-time_Password_Algorithm)
 - [About TOTP](https://en.wikipedia.org/wiki/Time-based_One-time_Password_Algorithm)
 - [otphp docs](https://github.com/Spomky-Labs/otphp/tree/v8.3/doc)
-- [yii2-qrcode-helper](https://github.com/2amigos/yii2-qrcode-helper)
+- [qrcode-library](https://github.com/2amigos/qrcode-library)
 
 
 Credits
