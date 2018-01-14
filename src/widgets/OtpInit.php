@@ -65,16 +65,16 @@ class OtpInit extends InputWidget
 
     public function init()
     {
-        /** @var Otp $component */
-        $component = Yii::$app->get($this->component);
+        /** @var Otp $componentOtp */
+        $componentOtp = Yii::$app->get($this->component);
         parent::init();
 
         $secret = $this->model->{$this->attribute};
         if (!empty($secret)) {
-            $component->setSecret($secret);
+            $componentOtp->setSecret($secret);
         }
 
-        $this->otp = $component->getOtp();
+        $this->otp = $componentOtp->getOtp();
         $this->QrParams = array_merge($this->defaultQrParams, $this->QrParams);
     }
 
@@ -174,6 +174,8 @@ class OtpInit extends InputWidget
                 case 'label':
                     $label = is_string($param) ? $param : null;
                     break;
+                default:
+                    break;
             }
         }
 
@@ -221,6 +223,8 @@ class OtpInit extends InputWidget
                     break;
                 case 'size':
                     $size = $this->checkParamSize($param);
+                    break;
+                default:
                     break;
             }
         }
@@ -333,14 +337,12 @@ class OtpInit extends InputWidget
     private function checkParamColor($color)
     {
 
+        $max = max($color);
+        $min = min($color);
         if (!is_array($color)
             || count($color) != 3
-            || 255 < $color[0]
-            || 255 < $color[1]
-            || 255 < $color[2]
-            || 0 > $color[0]
-            || 0 > $color[1]
-            || 0 > $color[2]
+            || 255 < $max
+            || 0 > $min
         ) {
             throw new InvalidConfigException('OtpInit::$qrParams[\'encoding\'] Not correct color');
         }
