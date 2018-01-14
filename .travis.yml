@@ -19,8 +19,7 @@ install:
   - travis_retry composer install --dev --prefer-dist --no-interaction
 
 before_script:
-  - travis_retry composer self-update
-  - travis_retry composer install --no-interaction --prefer-source --dev
+  - php --version
 
 script:
   - vendor/bin/codecept run --steps functional -d
