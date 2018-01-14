@@ -86,25 +86,11 @@ class OtpInit extends InputWidget
 
 
     /**
-     * @return string
-     * @throws InvalidConfigException
+     * Render Image and link block
      */
     private function renderWidget()
     {
-        switch ($this->QrParams['type']) {
-            case JpgWriter::class :
-                $imgSrc = "data:image/jpeg;base64,";
-                $img = '<img src=' . $imgSrc . base64_encode($this->generateQr($this->otp->getProvisioningUri())) . ' />';
-                break;
-            case PngWriter::class :
-                $imgSrc = "data:image/png;base64,";
-                $img = '<img src=' . $imgSrc . base64_encode($this->generateQr($this->otp->getProvisioningUri())) . ' />';
-                break;
-            case SvgWriter::class :
-            case EpsWriter::class :
-            default:
-                $img = $this->generateQr($this->otp->getProvisioningUri());
-        }
+        $img = $this->getImageSource();
 
         echo "<div>$img</div>";
 
@@ -121,6 +107,26 @@ class OtpInit extends InputWidget
         echo Html::activeHiddenInput($this->model, $this->attribute, $this->options);
     }
 
+    private function getImageSource()
+    {
+        switch ($this->QrParams['type']) {
+            case JpgWriter::class :
+                $imgSrc = "data:image/jpeg;base64,";
+                $img = '<img src=' . $imgSrc . base64_encode($this->generateQr($this->otp->getProvisioningUri())) . ' />';
+                break;
+            case PngWriter::class :
+                $imgSrc = "data:image/png;base64,";
+                $img = '<img src=' . $imgSrc . base64_encode($this->generateQr($this->otp->getProvisioningUri())) . ' />';
+                break;
+            case SvgWriter::class :
+            case EpsWriter::class :
+            default:
+                $img = $this->generateQr($this->otp->getProvisioningUri());
+        }
+
+        return $img;
+    }
+
     /**
      * @param string $text
      * @return array|int
@@ -128,14 +134,12 @@ class OtpInit extends InputWidget
      */
     private function generateQr($text = '')
     {
-        $image = null;
-
-        $qr = $this->initQr($text);
-        $qr = $this->decorateQr($qr);
-        $qr = $this->initLogoQr($qr);
+        $qrCode = $this->initQr($text);
+        $qrCode = $this->decorateQr($qrCode);
+        $qrCode = $this->initLogoQr($qrCode);
 
 
-        $image = $qr->writeString();
+        $image = $qrCode->writeString();
 
         if(
             isset($this->QrParams['save'])
@@ -174,36 +178,35 @@ class OtpInit extends InputWidget
         }
 
         $writer = new $type();
-        /** @var QrCode $qr */
+        /** @var QrCode $qrCode */
         return (new QrCode($text, $level, $writer))
             ->useEncoding($encoding)
             ->setLabel($label);
     }
 
-    private function initLogoQr($qr)
+    private function initLogoQr($qrCode)
     {
         if (empty($this->QrParams['logo'])) {
-            return $qr;
+            return $qrCode;
         }
         $with = isset($this->QrParams['logoWith']) ? $this->QrParams['logoWith'] : null;
         $logo = $this->checkParamLogo($this->QrParams['logo']);
-        return $qr->useLogo($logo)
+        return $qrCode->useLogo($logo)
             ->setLogoWidth($with);
     }
 
     /**
-     * @param QrCode $qr
+     * @param QrCode $qrCode
      * @return QrCode
      * @throws InvalidConfigException
      */
-    private function decorateQr(QrCode $qr)
+    private function decorateQr(QrCode $qrCode)
     {
 
         $foreColor = [0,0,0];
         $backColor = [255,255,255];
         $size = 300;
         $margin = 10;
-        $label = null;
 
         foreach ($this->QrParams as $name => $param) {
             switch ($name) {
@@ -221,7 +224,7 @@ class OtpInit extends InputWidget
                     break;
             }
         }
-        return $qr->useForegroundColor($foreColor[0], $foreColor[1], $foreColor[2])
+        return $qrCode->useForegroundColor($foreColor[0], $foreColor[1], $foreColor[2])
             ->useBackgroundColor($backColor[0], $backColor[1], $backColor[2])
             ->setMargin($margin)
             ->setSize($size);
@@ -230,9 +233,9 @@ class OtpInit extends InputWidget
     private function checkParamOutfile($outfile)
     {
         if(is_string($outfile) && !is_dir(dirname($outfile))) {
-            throw new InvalidConfigException('OtpInit::$QrParams[\'outfile\'] error ' . dirname($outfile) . ' is not dir');
+            throw new InvalidConfigException('OtpInit::$qrParams[\'outfile\'] error ' . dirname($outfile) . ' is not dir');
         } elseif (!is_string($outfile) && $outfile !== false) {
-            throw new InvalidConfigException('OtpInit::$QrParams[\'outfile\'] is not false or file path');
+            throw new InvalidConfigException('OtpInit::$qrParams[\'outfile\'] is not false or file path');
         }
         if($outfile === false) {
             $outfile = Yii::$app->runtimePath . DIRECTORY_SEPARATOR .
@@ -247,14 +250,14 @@ class OtpInit extends InputWidget
 
     private function checkParamLevel($level)
     {
-        $qrLevels = [
+        $qrCodeLevels = [
             ErrorCorrectionLevelInterface::LOW,
             ErrorCorrectionLevelInterface::MEDIUM,
             ErrorCorrectionLevelInterface::QUARTILE,
             ErrorCorrectionLevelInterface::HIGH
         ];
-        if (!in_array($level, $qrLevels, true)) {
-            throw new InvalidConfigException('OtpInit::$QrParams[\'level\'] is not ErrorCorrectionLevelInterface*');
+        if (!in_array($level, $qrCodeLevels, true)) {
+            throw new InvalidConfigException('OtpInit::$qrParams[\'level\'] is not ErrorCorrectionLevelInterface*');
         }
         return $level;
     }
@@ -262,7 +265,7 @@ class OtpInit extends InputWidget
     private function checkParamSize($size)
     {
         if (!is_int($size)) {
-            throw new InvalidConfigException('OtpInit::$QrParams[\'size\'] is not integer');
+            throw new InvalidConfigException('OtpInit::$qrParams[\'size\'] is not integer');
         }
         return $size;
     }
@@ -270,7 +273,7 @@ class OtpInit extends InputWidget
     private function checkParamMargin($margin)
     {
         if (!is_int($margin)) {
-            throw new InvalidConfigException('OtpInit::$QrParams[\'margin\'] is not integer');
+            throw new InvalidConfigException('OtpInit::$qrParams[\'margin\'] is not integer');
         }
         return $margin;
     }
@@ -279,7 +282,7 @@ class OtpInit extends InputWidget
     private function checkParamSave($saveAndPrint)
     {
         if (!is_bool($saveAndPrint)) {
-            throw new InvalidConfigException('OtpInit::$QrParams[\'save\'] is not boolean');
+            throw new InvalidConfigException('OtpInit::$qrParams[\'save\'] is not boolean');
         }
         return $saveAndPrint;
     }
@@ -287,7 +290,7 @@ class OtpInit extends InputWidget
     private function checkParamType($type)
     {
         if(!is_subclass_of($type, WriterInterface::class)) {
-            throw new InvalidConfigException('OtpInit::$QrParams[\'type\'] is not extend ' . WriterInterface::class);
+            throw new InvalidConfigException('OtpInit::$qrParams[\'type\'] is not extend ' . WriterInterface::class);
         }
         return $type;
     }
@@ -314,7 +317,7 @@ class OtpInit extends InputWidget
         }
 
         if (!is_file($logo)) {
-            throw new InvalidConfigException('OtpInit::$QrParams[\'logo\'] '.$logo.' is not exist');
+            throw new InvalidConfigException('OtpInit::$qrParams[\'logo\'] '.$logo.' is not exist');
         }
         return $logo;
     }
@@ -322,7 +325,7 @@ class OtpInit extends InputWidget
     private function checkParamEncoding($encoding)
     {
         if (CharacterSetEci::getCharacterSetECIByName($encoding) === null) {
-            throw new InvalidConfigException('OtpInit::$QrParams[\'encoding\'] Unknown '.$encoding.' encoding');
+            throw new InvalidConfigException('OtpInit::$qrParams[\'encoding\'] Unknown '.$encoding.' encoding');
         }
         return $encoding;
     }
@@ -339,7 +342,7 @@ class OtpInit extends InputWidget
             || 0 > $color[1]
             || 0 > $color[2]
         ) {
-            throw new InvalidConfigException('OtpInit::$QrParams[\'encoding\'] Not correct color');
+            throw new InvalidConfigException('OtpInit::$qrParams[\'encoding\'] Not correct color');
         }
         return $color;
     }
