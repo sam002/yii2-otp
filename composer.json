@@ -24,7 +24,7 @@
   },
   "require-dev": {
     "yiisoft/yii2-codeception": "~2.0.0",
-    "codeception/codeception": "^2.3",
+    "codeception/codeception": "*",
     "predis/predis": "^1.0",
     "yiisoft/yii2-redis": "~2.0.0"
   },
