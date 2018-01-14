@@ -50,7 +50,7 @@ use sam002\otp\Otp;
         'digits' => 6,
         
         //  Algorithm for hashing
-        'digets' => 'sha1',
+        'digest' => 'sha1',
         
         // Label of application
         'label' => 'yii2-otp',
@@ -127,7 +127,7 @@ Further Information
 -------------------
 - [About HOTP](https://en.wikipedia.org/wiki/HMAC-based_One-time_Password_Algorithm)
 - [About TOTP](https://en.wikipedia.org/wiki/Time-based_One-time_Password_Algorithm)
-- [otphp docs](https://github.com/Spomky-Labs/otphp/tree/master/doc)
+- [otphp docs](https://github.com/Spomky-Labs/otphp/tree/v8.3/doc)
 - [yii2-qrcode-helper](https://github.com/2amigos/yii2-qrcode-helper)
 
 
