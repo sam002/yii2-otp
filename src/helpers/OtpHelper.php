@@ -7,7 +7,7 @@
 
 namespace sam002\otp\helpers;
 
-use Base32\Base32;
+use ParagonIE\ConstantTime\Base32;
 use yii\base\Security;
 use OTPHP\HOTP;
 use OTPHP\TOTP;
@@ -19,7 +19,7 @@ class OtpHelper
      * @param int $length
      * @return string
      */
-    static public function generateSecret($length = 20)
+    public static function generateSecret($length = 20)
     {
         $security = new Security();
         $full = Base32::encode($security->generateRandomString($length));
@@ -31,15 +31,15 @@ class OtpHelper
      * @param int $digits
      * @param string $digest
      * @param int $interval
+     * @param string $issuer
      * @return TOTP
      */
-    static public function getTotp($label = '', $digits = 6, $digest = 'sha1', $interval = 30)
+    public static function getTotp($label = '', $digits = 6, $digest = 'sha1', $interval = 30, $issuer='')
     {
-        $totp = new TOTP();
-        $totp->setLabel($label)
-            ->setDigits($digits)
-            ->setDigest($digest)
-            ->setInterval($interval);
+        $totp = new TOTP($label, null, $interval, $digest, $digits);
+        if(!empty($issuer)) {
+            $totp->setIssuer($issuer);
+        }
 
         return $totp;
     }
@@ -49,16 +49,16 @@ class OtpHelper
      * @param int $digits
      * @param string $digest
      * @param int $counter
+     * @param string $issuer
      * @return HOTP
      */
-    static public function getHotp($label = '', $digits = 6, $digest = 'sha1', $counter = 0)
+    public static function getHotp($label = '', $digits = 6, $digest = 'sha1', $counter = 0, $issuer='')
     {
-        $totp = new HOTP();
-        $totp->setLabel($label)
-            ->setDigits($digits)
-            ->setDigest($digest)
-            ->setCounter($counter);
+        $hotp = new HOTP($label, null, $counter, $digest, $digits);
+        if(!empty($issuer)) {
+            $hotp->setIssuer($issuer);
+        }
 
-        return $totp;
+        return $hotp;
     }
 }

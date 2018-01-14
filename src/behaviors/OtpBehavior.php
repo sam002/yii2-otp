@@ -88,10 +88,11 @@ class OtpBehavior extends Behavior
         $secret = $this->owner->{$this->secretAttribute};
         if (empty($secret)) {
             $this->owner->addError($this->codeAttribute, Yii::t('yii', 'The secret is empty.'));
-        }
-        $this->otp->setSecret($secret);
-        if (!$this->secretConfirmed()) {
-            $this->owner->addError($this->codeAttribute, Yii::t('yii', 'The code is incorrect.'));
+        } else {
+            $this->otp->setSecret($secret);
+            if (!$this->secretConfirmed()) {
+                $this->owner->addError($this->codeAttribute, Yii::t('yii', 'The code is incorrect.'));
+            }
         }
     }
 

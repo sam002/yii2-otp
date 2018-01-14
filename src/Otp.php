@@ -7,7 +7,7 @@
 
 namespace sam002\otp;
 
-use Base32\Base32;
+use ParagonIE\ConstantTime\Base32;
 use sam002\otp\helpers\OtpHelper;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -24,7 +24,8 @@ use yii\validators\UrlValidator;
  *          'class' => 'sam002\otp\Otp',
  *          'algorithm' => sam002\otp\Otp::ALGORITHM_TOTP
  *          'digits' => 6,
- *          'digest' => 'sha1',
+ *          'digest' => 'sha256',
+ *          'issuer' => 'sam002',
  *          'label' => 'yii2-otp',
  *          'imgLabelUrl' => Yii,
  *          'secretLength' => 16
@@ -58,7 +59,7 @@ class Otp extends Component
     /**
      * @var string
      */
-    public $digest = 'sha1';
+    public $digest = 'sha256';
 
     /**
      * @var int
@@ -68,7 +69,12 @@ class Otp extends Component
     /**
      * @var int
      */
-    public $counter = null;
+    public $counter = 0;
+
+    /**
+     * @var string
+     */
+    public $issuer = '';
 
     /**
      * @var string
@@ -97,9 +103,9 @@ class Otp extends Component
     {
         parent::init();
         if ($this->algorithm === self::ALGORITHM_TOTP) {
-            $this->otp = OtpHelper::getTotp($this->label, $this->digits, $this->digest, $this->interval);
+            $this->otp = OtpHelper::getTotp($this->label, $this->digits, $this->digest, $this->interval, $this->issuer);
         } elseif ($this->algorithm === self::ALGORITHM_HOTP) {
-            $this->otp = OtpHelper::getHotp($this->label, $this->digits, $this->digest, $this->counter);
+            $this->otp = OtpHelper::getHotp($this->label, $this->digits, $this->digest, $this->counter, $this->issuer);
         } else {
             throw new InvalidConfigException('otp::$algorithm = \"' . $this->algorithm . '\" not allowed, only Otp::ALGORITHM_TOTP or Otp::ALGORITHM_HOTP');
         }
@@ -107,7 +113,7 @@ class Otp extends Component
         if (!empty($this->imgLabelUrl) && is_string($this->imgLabelUrl)) {
             $validator = new UrlValidator();
             if ($validator->validate($this->imgLabelUrl)) {
-                $this->otp->setImage($this->imgLabelUrl);
+                $this->otp->setParameter('image',$this->imgLabelUrl);
             } else {
                 throw new InvalidConfigException($validator->message);
             }
@@ -119,7 +125,7 @@ class Otp extends Component
      */
     public function getOtp()
     {
-        $this->otp->setSecret($this->getSecret());
+        $this->otp->setParameter('secret', strtoupper($this->getSecret()));
         return $this->otp;
     }
 
@@ -142,15 +148,19 @@ class Otp extends Component
     {
         if(strlen($value) !== $this->secretLength) {
             throw new InvalidConfigException('Otp::setSecret length is not equal to ' . $this->secretLength . ' ([\'length\'] component settenings)');
-        } elseif ( strlen(Base32::decode($value)) < 1 ) {
+        } elseif ( strlen(Base32::decodeUpper(strtoupper($value))) < 1 ) {
             throw new InvalidConfigException('Otp::setSecret incorect, encode as Base32');
         }
-        $this->otp->setSecret($value);
+        $this->otp->setParameter('secret', strtoupper($value));
         $this->secret = $value;
     }
 
-    public function valideteCode($code, $window = 0)
+    public function valideteCode($code, $window = null)
     {
+        if ($this->counter === 0 && $this->algorithm === self::ALGORITHM_TOTP) {
+            //todo add time configuration
+            $this->counter = null;
+        }
         return $this->otp->verify($code, $this->counter, $window);
     }
 }
