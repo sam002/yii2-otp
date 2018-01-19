@@ -29,9 +29,8 @@ install:
   - travis_retry composer install --prefer-dist --no-interaction
 
 before_script:
+  - composer update --prefer-source $PREFER_LOWEST 
   - php --version
-  - composer update $PREFER_LOWEST
 
 script:
-  - composer ci
   - vendor/bin/codecept run --steps functional -d
