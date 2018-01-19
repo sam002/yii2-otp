@@ -6,6 +6,11 @@ php:
   - 7.1
   - 7.2
 
+env:
+  matrix:
+    - PREFER_LOWEST="--prefer-lowest --prefer-stable"
+    - PREFER_LOWEST=""
+
 # faster builds on new travis setup not using sudo
 sudo: false
 
@@ -25,6 +30,8 @@ install:
 
 before_script:
   - php --version
+  - composer update $PREFER_LOWEST
 
 script:
+  - composer ci
   - vendor/bin/codecept run --steps functional -d
