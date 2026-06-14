@@ -1,4 +1,5 @@
 # yii2-otp
+[![Project Page](https://img.shields.io/badge/sam002.net-Project_Page-0d1117?style=flat-square)](https://sam002.net/projects/yii2-otp/)
 [![Code Climate](https://codeclimate.com/github/sam002/yii2-otp/badges/gpa.svg)](https://codeclimate.com/github/sam002/yii2-otp)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/cb3e45a9-f9a3-4843-bfe5-56a1cc7883d2/small.png)](https://insight.sensiolabs.com/projects/cb3e45a9-f9a3-4843-bfe5-56a1cc7883d2)
 
